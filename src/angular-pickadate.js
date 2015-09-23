@@ -250,7 +250,8 @@
           minDate: '=',
           maxDate: '=',
           disabledDates: '=',
-          weekStartsOn: '='
+          weekStartsOn: '=',
+          dayClass: '&?' // optional callback to define a css class for each day
         },
 
         link: function(scope, element, attrs, ngModel)  {
@@ -264,9 +265,12 @@
                 nextMonthSelectable:     /^(next|both)$/.test(attrs.selectOtherMonths),
                 weekStartsOn: scope.weekStartsOn,
                 noExtraRows: attrs.hasOwnProperty('noExtraRows')
-              });
+            }),
+            fnNoop = function() {};
 
           scope.displayPicker = !wantsModal;
+
+          scope.dayClassFormatFn = scope.dayClass || fnNoop;
 
           scope.setDate = function(dateObj) {
             if (!dateObj.enabled) return;
@@ -357,6 +361,8 @@
 
               if (date.today)    date.classNames.push('pickadate-today');
               if (date.disabled) date.classNames.push('pickadate-unavailable');
+
+              date.classNames.push(scope.dayClassFormatFn(date));
 
               return date;
             });
