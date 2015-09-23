@@ -251,7 +251,8 @@
           maxDate: '=',
           disabledDates: '=',
           weekStartsOn: '=',
-          dayClass: '&?' // optional callback to define a css class for each day
+          dayClass: '&?', // optional callback to define a css class for each day
+          onDateChanged: '&?'
         },
 
         link: function(scope, element, attrs, ngModel)  {
@@ -270,7 +271,12 @@
 
           scope.displayPicker = !wantsModal;
 
-          scope.dayClassFormatFn = scope.dayClass || fnNoop;
+          scope.dayClassFormatFn = (angular.isFunction(scope.dayClass)) ? scope.dayClass : fnNoop;
+          scope.onDateChangedFn = (angular.isFunction(scope.onDateChanged)) ? scope.onDateChanged : fnNoop;
+
+          scope.$on('RefreshPickadate', function () {
+              render();
+          });
 
           scope.setDate = function(dateObj) {
             if (!dateObj.enabled) return;
@@ -378,6 +384,8 @@
             }
 
             if (!options.skipRenderInput) element.val(ngModel.$viewValue);
+
+            scope.onDateChangedFn(value[0]);
           }
 
           function toggleDate(dateObj, dateArray) {
